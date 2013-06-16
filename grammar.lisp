@@ -2,18 +2,22 @@
 
 (in-package :purl)
 
-(defun =user ()
+(defun =user (terminator)
   "Parser for user."
-  (let ((terminator (=or (=character #\:)
-			 (=character #\@))))
-    (=prog1 (=string-of (=not terminator))
-	    terminator)))
+  (=prog1 (=string-of (=not terminator))
+          terminator))
 
 (defun =password ()
   "Parser for password."
   (let ((terminator (=character #\@)))
     (=prog1 (=string-of (=not terminator))
 	    terminator)))
+
+(defun =credentials ()
+  "Parser for user credentials."
+  (=or (=list (=user (=character #\@)))
+       (=list (=user (=character #\:))
+              (=password))))
 
 (defun =host ()
   "Parser for host."
@@ -29,17 +33,20 @@
 (defun =path ()
   "Parser for path."
   (=prog2 (=character #\/)
-	  (=string-of (=not (=end-of-input)))))
+	  (=maybe (=string-of (=not (=end-of-input))))))
 
 (defun =common-address ()
   "Parser for common address."
-  (=prog1 (=list (=maybe (=user))
-		 (=maybe (=password))
-		 (=host)
-		 (=maybe (=port))
-		 (=maybe (=path)))
-	  (=end-of-input)))
-
+  (=let* ((credentials (=maybe (=credentials)))
+          (host (=maybe (=host)))
+          (port (=maybe (=port)))
+          (path (=maybe (=path)))
+          (_ (=end-of-input)))
+    (=result (list (first credentials)
+                   (second credentials)
+                   host
+                   port
+                   path))))
 (defun =scheme ()
   "Parser for URL scheme."
   (=prog1 (=string-of (=or (=satisfies #'alphanumericp)

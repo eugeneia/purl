@@ -18,7 +18,7 @@
 
 (defun common-address-string (common-address)
   "Return string for COMMON-ADDRESS."
-  (format nil "~@[~a~]~@[:~a~]~@[@~*~]~a~@[:~a~]~@[/~a~]"
+  (format nil "~@[~a~]~@[:~a~]~@[@~*~]~@[~a~]~@[:~a~]~@[/~a~]"
 	  #1=(common-address-user common-address)
 	  #2=(common-address-password common-address)
 	  (or #1# #2#)
@@ -71,33 +71,28 @@
   PORT and PATH."
   (if address
       (make-url% :scheme scheme :address% address)
-      (if host
-	  (make-url% :scheme scheme
-		     :address% (make-common-address
-				:host host
-				:user user
-				:password password
-				:port port
-				:path path))
-	  (make-instance 'malformed-url :message "Missing URL host."))))
+      (make-url% :scheme scheme
+                 :address% (make-common-address
+                            :host host
+                            :user user
+                            :password password
+                            :port port
+                            :path path))))
 
 (defun parse-common-address (url-address)
   "Parse COMMON-ADDRESS structure from URL-ADDRESS."
-  (destructuring-bind (&optional user password host port path)
-      (run (=common-address) url-address)
-    (unless host
-      (error 'malformed-url :message "Cannot parse address."))
+  (destructuring-bind (user password host port path)
+      (or (run (=common-address) url-address)
+          (error 'malformed-url
+                 :message "Can not parse common address."))
     (make-common-address
      :user user
      :password password
-     :host (if (= 0 (length host))
-	       (error 'malformed-url :message "Missing URL host.")
-	       host)
+     :host (unless (= 0 (length host)) host)
      :port port
-     :path (unless (= 0 (length path))
-	     path))))
+     :path (unless (= 0 (length path)) path))))
 
-(defun url (string)
+(defun parse-url (string)
   "Return URL structure for STRING."
   (destructuring-bind (&optional scheme common-address-p address)
       (run (=url) string)
@@ -107,6 +102,13 @@
 	       :address% (if common-address-p
 			     (parse-common-address address)
 			     address))))
+
+(defun url (url)
+  "If URL is a string return parsed URL structure. Otherwise return URL
+as is."
+  (etypecase url
+    (string (parse-url url))
+    (url url)))
 
 (defun url-p (thing)
   "Predicate to test if THING is a valid URL."
