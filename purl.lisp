@@ -13,7 +13,7 @@
 (defstruct (url (:constructor make-url%)
 		(:predicate url-p%))
   "URL type."
-  (scheme nil :type symbol)
+  (scheme% nil :type symbol)
   (address% nil :type (or string common-address)))
 
 (defun common-address-string (common-address)
@@ -26,36 +26,46 @@
 	  (common-address-port common-address)
 	  (common-address-path common-address)))
 
+(defun url-scheme (url)
+  "Get scheme for URL."
+  (url-scheme% (url url)))
+
 (defun url-address (url)
   "Get address for URL."
-  (if (common-address-p #1=(url-address% url))
-      (common-address-string #1#)
-      #1#))
+  (let ((url (url url)))
+    (if (common-address-p #1=(url-address% url))
+        (common-address-string #1#)
+        #1#)))
 
 (defun url-user (url)
   "Get user for URL."
-  (when (common-address-p #1=(url-address% url))
-    (common-address-user #1#)))
+  (let ((url (url url)))
+    (when (common-address-p #1=(url-address% url))
+      (common-address-user #1#))))
 
 (defun url-password (url)
   "Get password for URL."
-  (when (common-address-p #1=(url-address% url))
-    (common-address-password #1#)))
+  (let ((url (url url)))
+    (when (common-address-p #1=(url-address% url))
+      (common-address-password #1#))))
 
 (defun url-host (url)
   "Get host for URL."
-  (when (common-address-p #1=(url-address% url))
-    (common-address-host #1#)))
+  (let ((url (url url)))
+    (when (common-address-p #1=(url-address% url))
+      (common-address-host #1#))))
 
 (defun url-port (url)
   "Get port for URL."
-  (when (common-address-p #1=(url-address% url))
-    (common-address-port #1#)))
+  (let ((url (url url)))
+    (when (common-address-p #1=(url-address% url))
+      (common-address-port #1#))))
 
 (defun url-path (url)
   "Get path for URL."
-  (when (common-address-p #1=(url-address% url))
-    (common-address-path #1#)))
+  (let ((url (url url)))
+    (when (common-address-p #1=(url-address% url))
+      (common-address-path #1#))))
 
 (define-condition malformed-url (error)
   ((message :type string
@@ -98,7 +108,7 @@
       (run (=url) string)
     (unless scheme
       (error 'malformed-url :message "Can not parse URL."))
-    (make-url% :scheme (intern (string-upcase scheme) :keyword)
+    (make-url% :scheme% (intern (string-upcase scheme) :keyword)
 	       :address% (if common-address-p
 			     (parse-common-address address)
 			     address))))
@@ -119,12 +129,14 @@ as is."
 
 (defun url= (url-x url-y)
   "Test URL-X and URL-Y for equality."
-  (and (eq (url-scheme url-x) (url-scheme url-y))
-       (equal (url-user url-x) (url-user url-y))
-       (equal (url-password url-x) (url-password url-y))
-       (equal (url-host url-x) (url-host url-y))
-       (equal (url-port url-x) (url-port url-y))
-       (equal (url-path url-x) (url-path url-y))))
+  (let ((url-x (url url-x))
+        (url-y (url url-y)))
+    (and (eq (url-scheme% url-x) (url-scheme% url-y))
+         (equal (url-user url-x) (url-user url-y))
+         (equal (url-password url-x) (url-password url-y))
+         (equal (url-host url-x) (url-host url-y))
+         (equal (url-port url-x) (url-port url-y))
+         (equal (url-path url-x) (url-path url-y)))))
 
 (defun url-scheme-string (scheme)
   "Return string for SCHEME."
@@ -132,13 +144,14 @@ as is."
 
 (defun url-string (url)
   "Return string for URL."
-  (if (common-address-p #1=(url-address% url))
-      (format nil "~a://~a"
-	      (url-scheme-string (url-scheme url))
-	      (common-address-string #1#))
-      (format nil "~a:~a"
-	      (url-scheme-string (url-scheme url))
-	      #1#)))
+  (let ((url (url url)))
+    (if (common-address-p #1=(url-address% url))
+        (format nil "~a://~a"
+                (url-scheme-string (url-scheme% url))
+                (common-address-string #1#))
+        (format nil "~a:~a"
+                (url-scheme-string (url-scheme% url))
+                #1#))))
 
 (defmethod print-object ((url url) stream)
   (format stream "~a" (url-string url)))
