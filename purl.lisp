@@ -158,7 +158,7 @@ as is."
 
 (defun reserved-p (char)
   "Predicate to test if CHAR is reserved."
-  (not (or (alphanumeric-p char)
+  (not (or (alphanumericp char)
 	   (member char '(#\$ #\- #\_ #\. #\+ #\!
 			  #\* #\' #\( #\) #\,)))))
 
