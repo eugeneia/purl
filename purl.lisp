@@ -7,7 +7,7 @@
   (user nil :type (or string symbol))
   (password nil :type (or string symbol))
   (host nil :type (or string symbol))
-  (port nil :type (or unsigned-integer symbol))
+  (port nil :type (or unsigned-byte symbol))
   (path nil :type (or string symbol)))
 
 (defstruct (url (:constructor make-url%)
