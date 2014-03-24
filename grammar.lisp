@@ -2,22 +2,21 @@
 
 (in-package :purl)
 
-(defun =user (terminator)
+(defun =user ()
   "Parser for user."
-  (=prog1 (=string-of (=not terminator))
-          terminator))
+  (=string-of (=not (=or (=character #\:)
+                         (=character #\@)))))
 
 (defun =password ()
   "Parser for password."
-  (let ((terminator (=character #\@)))
-    (=prog1 (=string-of (=not terminator))
-	    terminator)))
+  (=and (=character #\:)
+        (=string-of (=not (=character #\@)))))
 
 (defun =credentials ()
   "Parser for user credentials."
-  (=or (=list (=user (=character #\@)))
-       (=list (=user (=character #\:))
-              (=password))))
+  (=prog1 (=list (=maybe (=user))
+                 (=maybe (=password)))
+          (=character #\@)))
 
 (defun =host ()
   "Parser for host."
