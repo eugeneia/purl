@@ -3,9 +3,9 @@
 (defpackage purl
   (:documentation "Parse and print URLs.")
   (:use :cl
-	:smug
-	:smug.characters
-	:smug.numerals
+	:mpc
+	:mpc.characters
+	:mpc.numerals
 	:percent-encoding)
   (:export :make-url
 	   :url
