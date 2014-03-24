@@ -1,1 +1,14 @@
-No known issues.
+PURL interns scheme strings into the {KEYWORD} package. If you parse URLs
+from untrusted input, an attacker could exploit this behaviour as a
+denial of service attack. A possible defense is shown below.
+
+#code Defend against {INTERN} exploit.#
+(defparameter *my-schemes* '(:http :ftp :mailto))
+
+(defun safe-url (string)
+  (let ((url (url string)))
+    (if (member (url-scheme url) *my-schemes*)
+        url
+        (progn (unintern (url-scheme url) :keyword)
+               (error "Unknown SCHEME: ~a" string)))))
+#
