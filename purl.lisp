@@ -80,8 +80,8 @@
   "Make URL for SCHEME and ADDRESS or SCHEME and USER, PASSWORD, HOST,
   PORT and PATH."
   (if address
-      (make-url% :scheme scheme :address% address)
-      (make-url% :scheme scheme
+      (make-url% :scheme% scheme :address% address)
+      (make-url% :scheme% scheme
                  :address% (make-common-address
                             :host host
                             :user user
@@ -131,7 +131,7 @@ as is."
   "Test URL-X and URL-Y for equality."
   (let ((url-x (url url-x))
         (url-y (url url-y)))
-    (and (eq (url-scheme% url-x) (url-scheme% url-y))
+    (and (eq (url-scheme url-x) (url-scheme url-y))
          (equal (url-user url-x) (url-user url-y))
          (equal (url-password url-x) (url-password url-y))
          (equal (url-host url-x) (url-host url-y))
