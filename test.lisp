@@ -12,7 +12,8 @@
 	   #.(make-url :scheme
 	      :address "body"))
 	  ("scheme://host"
-	   #.(make-url :scheme :host "host"))
+	   #.(make-url :scheme
+              :host "host"))
 	  ("scheme://:password@host"
 	   #.(make-url :scheme
 	      :host "host" :password "password"))
@@ -33,3 +34,7 @@
 	      :host "host" :port 42 :path "path")))
      do (unless (url= (url string) result)
 	  (error "Parser: ~a is not equal to ~a." string result))))
+
+(defun run-tests ()
+  "Run PURL tests."
+  (test-parsers))
