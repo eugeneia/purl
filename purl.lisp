@@ -156,16 +156,10 @@ as is."
 (defmethod print-object ((url url) stream)
   (format stream "~a" (url-string url)))
 
-(defun reserved-p (char)
-  "Predicate to test if CHAR is reserved."
-  (not (or (alphanumericp char)
-	   (member char '(#\$ #\- #\_ #\. #\+ #\!
-			  #\* #\' #\( #\) #\,)))))
-
 (defun url-encode (string)
   "Encode STRING to be URL safe."
-  (%-encode-string string #'reserved-p))
+  (encode string :test 'unreservedp :www-form nil :encoding :utf-8))
 
 (defun url-decode (string)
   "Decode URL encoded STRING."
-  (%-decode-string string))
+  (decode string :www-form nil :encoding :utf-8))
