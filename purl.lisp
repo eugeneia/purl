@@ -154,7 +154,7 @@ as is."
                 #1#))))
 
 (defmethod print-object ((url url) stream)
-  (format stream "~a" (url-string url)))
+  (print-object (url-string url) stream))
 
 (defun url-encode (string)
   "Encode STRING to be URL safe."
