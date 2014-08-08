@@ -158,7 +158,7 @@ as is."
 
 (defun url-encode (string)
   "Encode STRING to be URL safe."
-  (encode string :test 'unreservedp :www-form nil :encoding :utf-8))
+  (encode string :test #'unreservedp :www-form nil :encoding :utf-8))
 
 (defun url-decode (string)
   "Decode URL encoded STRING."
