@@ -203,7 +203,8 @@
                   :port port
                   :path (etypecase path
                           (pathname (native-namestring path))
-                          (string path))))))
+                          (string path)
+                          (null))))))
 
 (defun parse-common-address (url-address)
   "Parse COMMON-ADDRESS structure from URL-ADDRESS."
