@@ -48,7 +48,7 @@
                    path))))
 (defun =scheme ()
   "Parser for URL scheme."
-  (=prog1 (=string-of (=or (=satisfies #'alphanumericp)
+  (=prog1 (=string-of (=or (=satisfies 'alphanumericp)
 			   (=one-of '(#\+ #\. #\-))))
 	  (=character #\:)))
 
