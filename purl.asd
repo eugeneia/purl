@@ -13,8 +13,8 @@
   :license "GNU AGPL"
   :version "1.0"
   :components ((:file "package")
-	       (:file "grammar"
-		      :depends-on ("package"))
-	       (:file "purl"
-		      :depends-on ("package" "grammar")))
+               (:file "grammar"
+                      :depends-on ("package"))
+               (:file "purl"
+                      :depends-on ("package" "grammar")))
   :depends-on ("mpc" "percent-encoding" "uiop"))

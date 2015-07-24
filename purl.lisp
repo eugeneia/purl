@@ -11,7 +11,7 @@
   (path nil :type (or string null)))
 
 (defstruct (url (:constructor make-url%)
-		(:predicate url-p%))
+                (:predicate url-p%))
   "A _url_ is a structured _object_ which represents a _Uniform Resource
   Locator_ (URL)."
   (scheme% nil :type keyword)
@@ -20,12 +20,12 @@
 (defun common-address-string (common-address)
   "Return string for COMMON-ADDRESS."
   (format nil "~@[~a~]~@[:~a~]~@[@~*~]~@[~a~]~@[:~a~]~@[/~a~]"
-	  #1=(common-address-user common-address)
-	  #2=(common-address-password common-address)
-	  (or #1# #2#)
-	  (common-address-host common-address)
-	  (common-address-port common-address)
-	  (common-address-path common-address)))
+          #1=(common-address-user common-address)
+          #2=(common-address-password common-address)
+          (or #1# #2#)
+          (common-address-host common-address)
+          (common-address-port common-address)
+          (common-address-path common-address)))
 
 (defun url-scheme (url)
   "*Arguments and Values:*
@@ -115,11 +115,11 @@
 
 (define-condition malformed-url (error)
   ((message :type string
-	    :initarg :message
-	    :initform (error "Must supply MESSAGE.")
-	    :documentation "Error description."))
+            :initarg :message
+            :initform (error "Must supply MESSAGE.")
+            :documentation "Error description."))
   (:report (lambda (error stream)
-	     (write-string (slot-value error 'message) stream)))
+             (write-string (slot-value error 'message) stream)))
   (:documentation "Condition signaling a malformed URL string."))
 
 (defun url-encode (string)
@@ -225,9 +225,9 @@
     (unless scheme
       (error 'malformed-url :message "Can not parse URL."))
     (make-url% :scheme% (intern (string-upcase scheme) :keyword)
-	       :address% (if common-address-p
-			     (parse-common-address address)
-			     address))))
+               :address% (if common-address-p
+                             (parse-common-address address)
+                             address))))
 
 (defun url (urlspec)
   "*Arguments and Values:*
@@ -265,8 +265,8 @@
    returns _false_."
   (or (url-p% object)
       (and (stringp object)
-	   (handler-case (not (null (url object)))
-	     (malformed-url () nil)))))
+           (handler-case (not (null (url object)))
+             (malformed-url () nil)))))
 
 (defun url= (url1 url2)
   "*Arguments and Values:*
