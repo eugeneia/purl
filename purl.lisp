@@ -4,16 +4,17 @@
 
 (defstruct common-address
   "Common address structure for IP-based protocols."
-  (user nil :type (or string symbol))
-  (password nil :type (or string symbol))
-  (host nil :type (or string symbol))
-  (port nil :type (or unsigned-byte symbol))
-  (path nil :type (or string symbol)))
+  (user nil :type (or string null))
+  (password nil :type (or string null))
+  (host nil :type (or string null))
+  (port nil :type (or unsigned-byte null))
+  (path nil :type (or string null)))
 
 (defstruct (url (:constructor make-url%)
 		(:predicate url-p%))
-  "URL type."
-  (scheme% nil :type symbol)
+  "A _url_ is a structured _object_ which represents a _Uniform Resource
+  Locator_ (URL)."
+  (scheme% nil :type keyword)
   (address% nil :type (or string common-address)))
 
 (defun common-address-string (common-address)
