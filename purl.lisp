@@ -28,41 +28,86 @@
 	  (common-address-path common-address)))
 
 (defun url-scheme (url)
-  "Get scheme for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-scheme} returns a _keyword_ denoting the scheme part of _url_."
   (url-scheme% (url url)))
 
 (defun url-address (url)
-  "Get address for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-address} returns a _string_ denoting the address part of _url_."
   (let ((url (url url)))
     (if (common-address-p #1=(url-address% url))
         (common-address-string #1#)
         #1#)))
 
 (defun url-user (url)
-  "Get user for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-user} returns a _string_ denoting the user part of _url_."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
       (common-address-user #1#))))
 
 (defun url-password (url)
-  "Get password for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-password} returns a _string_ denoting the password part of
+   _url_."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
       (common-address-password #1#))))
 
 (defun url-host (url)
-  "Get host for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-host} returns a _string_ denoting the host part of _url_."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
       (common-address-host #1#))))
 
 (defun url-port (url)
-  "Get port for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-port} returns a non-negative _integer_ denoting the port part of
+   _url_."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
       (common-address-port #1#))))
 
 (defun url-path (url)
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-path} returns a _string_ denoting the path part of _url_."
   "Get path for URL."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
@@ -78,11 +123,31 @@
   (:documentation "Condition signaling a malformed URL string."))
 
 (defun url-encode (string)
-  "Encode STRING to be URL safe."
+  "*Arguments and Values:*
+
+   _string_—a _string.
+
+   *Description*:
+
+   {url-encode} encodes _string_ using _Percent-Encoding_¹.
+
+   *See Also:*
+
+   + 1. [Percent-Encoding](http://tools.ietf.org/html/rfc3986#section-2.1)"
   (encode string :test 'unreservedp :www-form nil :encoding :utf-8))
 
 (defun url-decode (string)
-  "Decode URL encoded STRING."
+  "*Arguments and Values:*
+
+   _string_—a _string.
+
+   *Description*:
+
+   {url-decode} decodes encoded _string_ using _Percent-Encoding_¹.
+
+   *See Also:*
+
+   + 1. [Percent-Encoding](http://tools.ietf.org/html/rfc3986#section-2.1)"
   (decode string :www-form nil :encoding :utf-8))
 
 (defun encode-pathname (path)
@@ -102,8 +167,31 @@
    (encode-pathname (translate-logical-pathname path))))
 
 (defun make-url (scheme &key address user password host port path)
-  "Make URL for SCHEME and ADDRESS or SCHEME and USER, PASSWORD, HOST,
-  PORT and PATH."
+  "*Arguments and Values:*
+
+   _scheme_—a _keyword_ denoting a URL scheme.
+
+   _address_—a _string_ denoting a URL address for _scheme_ or {nil}. The
+   default is {nil}.
+
+   _user_, _password_, _host_—_strings_ denoting a user name, password or
+   hostname respectively or {nil}. The default is {nil}.
+
+   _path_—a _string_ or a _pathname_.
+
+   _port_—a positive _integer_ denoting a port number or {nil} . The
+   default is {nil}.
+
+   *Description*:
+
+   {make-url} returns a fresh _url_ of _scheme_. _Address_ is used as the
+   URL's address if supplied. Otherwise the URL's address will use
+   _Common Internet Scheme Syntax_¹ and its address is composed of the
+   _user_, _password_, _host_, _port_ and _path_ components.
+
+   *See Also:*
+
+   + 1. [Common Internet Scheme Syntax](http://tools.ietf.org/html/rfc1738#section-3.1)"
   (if address
       (make-url% :scheme% scheme :address% address)
       (make-url% :scheme% scheme
@@ -142,37 +230,74 @@
 			     address))))
 
 (defun url (urlspec)
-  "If URL is a string return parsed URL structure. Otherwise return URL
-as is."
+  "*Arguments and Values:*
+
+   _urlspec_—a _string_, a _pathname_ or a _url_.
+
+   *Description*:
+
+   {url} returns the _url_ denoted by _urlspec_. When _urlspec_ is a
+   string, {url} will attempt to parse _urlspec_ as a URL. When _urlspec_
+   is a _pathname_, {url} will return an equivalent _url_ using the
+   {:file} scheme.
+
+   *Exceptional Situations:*
+
+   An error of _type_ {malformed-url} is signaled when _urlspec_ is a
+   _string_ and can not be parsed as a URL.
+
+   An error of _type_ {type-error} is signaled when _urlspec_ is a
+   _pathname_ using a host component which is not a defined logical
+   host."
   (etypecase urlspec
     (string (parse-url urlspec))
     (pathname (make-url :file :path (native-namestring urlspec)))
     (url urlspec)))
 
 (defun url-p (object)
-  "Predicate to test if THING is a valid URL."
+  "*Arguments and Values:*
+
+   _object_—an _object_.
+
+   *Description*:
+
+   {url-p} returns _true_ if _object_ is of _type_ {url}; otherwise,
+   returns _false_."
   (or (url-p% object)
       (and (stringp object)
 	   (handler-case (not (null (url object)))
 	     (malformed-url () nil)))))
 
-(defun url= (url-x url-y)
-  "Test URL-X and URL-Y for equality."
-  (let ((url-x (url url-x))
-        (url-y (url url-y)))
-    (and (eq (url-scheme url-x) (url-scheme url-y))
-         (equal (url-user url-x) (url-user url-y))
-         (equal (url-password url-x) (url-password url-y))
-         (equal (url-host url-x) (url-host url-y))
-         (equal (url-port url-x) (url-port url-y))
-         (equal (url-path url-x) (url-path url-y)))))
+(defun url= (url1 url2)
+  "*Arguments and Values:*
+
+   _url1_, _url2_—_urls_.
+
+   *Description*:
+
+   {url=} returns _true_ if _url1_ and _url2_ are equal; otherwise,
+   returns _false_."
+  (let ((url1 (url url1))
+        (url2 (url url2)))
+    (and (eq (url-scheme url1) (url-scheme url2))
+         (equal (url-user url1) (url-user url2))
+         (equal (url-password url1) (url-password url2))
+         (equal (url-host url1) (url-host url2))
+         (equal (url-port url1) (url-port url2))
+         (equal (url-path url1) (url-path url2)))))
 
 (defun url-scheme-string (scheme)
   "Return string for SCHEME."
   (string-downcase (symbol-name scheme)))
 
 (defun url-string (url)
-  "Return string for URL."
+  "*Arguments and Values:*
+
+   _url_—a _url_ designator.
+
+   *Description*:
+
+   {url-string} returns a _string_ representation of _url_."
   (let ((url (url url)))
     (if (common-address-p #1=(url-address% url))
         (format nil "~a://~a"
