@@ -17,4 +17,4 @@
 		      :depends-on ("package"))
 	       (:file "purl"
 		      :depends-on ("package" "grammar")))
-  :depends-on ("mpc" "percent-encoding"))
+  :depends-on ("mpc" "percent-encoding" "uiop"))

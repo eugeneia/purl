@@ -77,18 +77,45 @@
 	     (write-string (slot-value error 'message) stream)))
   (:documentation "Condition signaling a malformed URL string."))
 
+(defun url-encode (string)
+  "Encode STRING to be URL safe."
+  (encode string :test 'unreservedp :www-form nil :encoding :utf-8))
+
+(defun url-decode (string)
+  "Decode URL encoded STRING."
+  (decode string :www-form nil :encoding :utf-8))
+
+(defun encode-pathname (path)
+  "URL encode physical PATH."
+  (make-pathname
+   :defaults path
+   :device (and #1=(pathname-device path) (url-encode #1#))
+   :directory (loop for component in (pathname-directory path)
+                 if (keywordp component) collect component
+                 else collect (url-encode component))
+   :name (and #2=(pathname-name path) (url-encode #2#))
+   :type (and #3=(pathname-type path) (url-encode #3#))))
+
+(defun pathname-url-path (path)
+  "Return URL path part for PATH."
+  (native-namestring
+   (encode-pathname (translate-logical-pathname path))))
+
 (defun make-url (scheme &key address user password host port path)
   "Make URL for SCHEME and ADDRESS or SCHEME and USER, PASSWORD, HOST,
   PORT and PATH."
   (if address
       (make-url% :scheme% scheme :address% address)
       (make-url% :scheme% scheme
-                 :address% (make-common-address
-                            :host host
-                            :user user
-                            :password password
-                            :port port
-                            :path path))))
+                 :address%
+                 (make-common-address
+                  :host host
+                  :user user
+                  :password password
+                  :port port
+                  :path (etypecase path
+                          (pathname (native-namestring path))
+                          (string path))))))
 
 (defun parse-common-address (url-address)
   "Parse COMMON-ADDRESS structure from URL-ADDRESS."
@@ -114,18 +141,19 @@
 			     (parse-common-address address)
 			     address))))
 
-(defun url (url)
+(defun url (urlspec)
   "If URL is a string return parsed URL structure. Otherwise return URL
 as is."
-  (etypecase url
-    (string (parse-url url))
-    (url url)))
+  (etypecase urlspec
+    (string (parse-url urlspec))
+    (pathname (make-url :file :path (native-namestring urlspec)))
+    (url urlspec)))
 
-(defun url-p (thing)
+(defun url-p (object)
   "Predicate to test if THING is a valid URL."
-  (or (url-p% thing)
-      (and (stringp thing)
-	   (handler-case (not (null (url thing)))
+  (or (url-p% object)
+      (and (stringp object)
+	   (handler-case (not (null (url object)))
 	     (malformed-url () nil)))))
 
 (defun url= (url-x url-y)
@@ -156,11 +184,3 @@ as is."
 
 (defmethod print-object ((url url) stream)
   (print-object (url-string url) stream))
-
-(defun url-encode (string)
-  "Encode STRING to be URL safe."
-  (encode string :test 'unreservedp :www-form nil :encoding :utf-8))
-
-(defun url-decode (string)
-  "Decode URL encoded STRING."
-  (decode string :www-form nil :encoding :utf-8))
