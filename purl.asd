@@ -11,7 +11,7 @@
   :description "Parse and print URLs as described in RFC 1738."
   :author "Max Rottenkolber <max@mr.gy>"
   :license "GNU AGPL"
-  :version "1.0"
+  :version "1.1"
   :components ((:file "package")
                (:file "grammar"
                       :depends-on ("package"))
