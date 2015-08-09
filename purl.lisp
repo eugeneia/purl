@@ -108,7 +108,6 @@
    *Description*:
 
    {url-path} returns a _string_ denoting the path part of _url_."
-  "Get path for URL."
   (let ((url (url url)))
     (when (common-address-p #1=(url-address% url))
       (common-address-path #1#))))
