@@ -208,20 +208,16 @@
 (defun parse-common-address (url-address)
   "Parse COMMON-ADDRESS structure from URL-ADDRESS."
   (destructuring-bind (user password host port path)
-      (or (run (=common-address) url-address)
+      (or (parse url-address (=common-address))
           (error 'malformed-url
                  :message "Can not parse common address."))
     (make-common-address
-     :user user
-     :password password
-     :host (unless (= 0 (length host)) host)
-     :port port
-     :path (unless (= 0 (length path)) path))))
+     :user user :password password :host host :port port :path path)))
 
 (defun parse-url (string)
   "Return URL structure for STRING."
   (destructuring-bind (&optional scheme common-address-p address)
-      (run (=url) string)
+      (parse string (=url))
     (unless scheme
       (error 'malformed-url :message "Can not parse URL."))
     (make-url% :scheme% (intern (string-upcase scheme) :keyword)
