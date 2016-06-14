@@ -16,13 +16,19 @@
               :host "host"))
 	  ("scheme://:password@host"
 	   #.(make-url :scheme
-	      :host "host" :password "password"))
+	      :host "host" :user "" :password "password"))
 	  ("scheme://user@host"
 	   #.(make-url :scheme
 	      :host "host" :user "user"))
 	  ("scheme://user:password@host"
 	   #.(make-url :scheme
 	      :host "host" :user "user" :password "password"))
+	  ("scheme://user:@host"
+	   #.(make-url :scheme
+	      :host "host" :user "user" :password ""))
+	  ("scheme://@host"
+	   #.(make-url :scheme
+	      :host "host" :user ""))
 	  ("scheme://host:42"
 	   #.(make-url :scheme
 	      :host "host" :port 42))
@@ -31,7 +37,10 @@
 	      :host "host" :path "path"))
 	  ("scheme://host:42/path"
 	   #.(make-url :scheme
-	      :host "host" :port 42 :path "path")))
+	      :host "host" :port 42 :path "path"))
+	  ("scheme:///path"
+	   #.(make-url :scheme
+              :path "path")))
      do (unless (url= (url string) result)
 	  (error "Parser: ~a is not equal to ~a." string result))))
 
