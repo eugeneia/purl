@@ -5,16 +5,16 @@
    "Parse and print _Uniform Resource Locators_ as defined in
     [RFC 1738](http://tools.ietf.org/html/rfc1738).
 
-    < Url designators
+    < URL Designators
 
      A _url designator_ is a value accepted by the {url} _function_.
      E.g. a _url_, a _string_ or a _pathname_.
 
     >")
   (:use :cl
-        :mpc
-        :mpc.characters
-        :mpc.numerals
+        :maxpc
+        :maxpc.char
+        :maxpc.digit
         :percent-encoding
         :uiop)
   (:export :make-url

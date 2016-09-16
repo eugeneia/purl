@@ -4,61 +4,54 @@
 
 (defun =user ()
   "Parser for user."
-  (=string-of (=not (=or (=character #\:)
-                         (=character #\@)))))
+  (=subseq (%any (?not (%or (?char #\:) (?char #\@))))))
 
 (defun =password ()
   "Parser for password."
-  (=and (=character #\:)
-        (=string-of (=not (=character #\@)))))
+  (=destructure (_ password)
+      (=list (?char #\:) (=subseq (%any (?not (?char #\@)))))))
 
 (defun =credentials ()
   "Parser for user credentials."
-  (=prog1 (=list (=maybe (=user))
-                 (=maybe (=password)))
-          (=character #\@)))
+  (=destructure (user password _)
+      (=list (=user) (%maybe (=password)) (?char #\@))
+    (list user password)))
 
 (defun =host ()
   "Parser for host."
-  (=string-of (=not (=or (=character #\:)
-			 (=character #\/)
-			 (=end-of-input)))))
+  (=subseq (%some (?not (%or (?char #\:) (?char #\/))))))
 
 (defun =port ()
   "Parser for port."
-  (=prog2 (=character #\:)
-	  (=natural-number)))
+  (=destructure (_ port) (=list (?char #\:) (=natural-number))))
 
 (defun =path ()
   "Parser for path."
-  (=prog2 (=character #\/)
-	  (=maybe (=string-of (=not (=end-of-input))))))
+  (=destructure (_ path) (=list (?char #\/) (=subseq (%some (?not (?end)))))))
 
 (defun =common-address ()
   "Parser for common address."
-  (=let* ((credentials (=maybe (=credentials)))
-          (host (=maybe (=host)))
-          (port (=maybe (=port)))
-          (path (=maybe (=path)))
-          (_ (=end-of-input)))
-    (=result (list (first credentials)
-                   (second credentials)
-                   host
-                   port
-                   path))))
+  (=destructure (credentials host port path _)
+      (=list (%maybe (=credentials))
+             (%maybe (=host))
+             (%maybe (=port))
+             (%maybe (=path))
+             (?end))
+    (list (first credentials) (second credentials) host port path)))
+
 (defun =scheme ()
   "Parser for URL scheme."
-  (=prog1 (=string-of (=or (=satisfies 'alphanumericp)
-			   (=one-of '(#\+ #\. #\-))))
-	  (=character #\:)))
+  (=destructure (scheme _)
+      (=list (=subseq (%any (%or (?satisfies 'alphanumericp)
+                                 (?test ('member '(#\+ #\. #\-))))))
+             (?char #\:))))
 
 (defun =common-address-p ()
   "Parser for URI address type."
-  (=and (=string "//")
-	(=result t)))
+  (=transform (?string "//") (constantly t)))
 
 (defun =url ()
   "Parser for URL."
   (=list (=scheme)
-	 (=maybe (=common-address-p))
-	 (=string-of (=not (=end-of-input)))))
+         (%maybe (=common-address-p))
+         (=subseq (%any (?not (?end))))))
