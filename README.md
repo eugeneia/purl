@@ -6,7 +6,7 @@ Provides a parser and defines a type for URLs as specified in
 [RFC1738](https://tools.ietf.org/html/rfc1738).
 
 Current version is
-[1.1.2](https://github.com/eugeneia/purl/releases/tag/v1.1.2).
+[1.2](https://github.com/eugeneia/purl/releases/tag/v1.2).
 
 **Documentation:**
 
