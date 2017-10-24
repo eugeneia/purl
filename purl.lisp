@@ -249,7 +249,7 @@
    host."
   (etypecase urlspec
     (string (parse-url urlspec))
-    (pathname (make-url :file :path (native-namestring urlspec)))
+    (pathname (make-url :file :path urlspec))
     (url urlspec)))
 
 (defun url-p (object)
