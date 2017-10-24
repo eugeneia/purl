@@ -149,21 +149,23 @@
    + 1. [Percent-Encoding](http://tools.ietf.org/html/rfc3986#section-2.1)"
   (decode string :www-form nil :encoding :utf-8))
 
-(defun encode-pathname (path)
-  "URL encode physical PATH."
-  (make-pathname
-   :defaults path
-   :device (and #1=(pathname-device path) (url-encode #1#))
-   :directory (loop for component in (pathname-directory path)
-                 if (keywordp component) collect component
-                 else collect (url-encode component))
-   :name (and #2=(pathname-name path) (url-encode #2#))
-   :type (and #3=(pathname-type path) (url-encode #3#))))
+(defun convert-pathname (path enc/dec)
+  (flet ((convert (x) (funcall enc/dec x)))
+    (make-pathname
+     :defaults path
+     :device (and #1=(pathname-device path) (convert #1#))
+     :directory (loop for component in (pathname-directory path)
+                   if (keywordp component) collect component
+                   else collect (convert component))
+     :name (and #2=(pathname-name path) (convert #2#))
+     :type (and #3=(pathname-type path) (convert #3#)))))
 
-(defun pathname-url-path (path)
-  "Return URL path part for PATH."
-  (native-namestring
-   (encode-pathname (translate-logical-pathname path))))
+(defun url-encode-pathname (path)
+  (convert-pathname path 'url-encode))
+
+(defun url-decode-pathname (path)
+  "URL decode physical PATH."
+  (convert-pathname path 'url-decode))
 
 (defun make-url (scheme &key address user password host port path)
   "*Arguments and Values:*

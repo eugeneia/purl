@@ -30,4 +30,6 @@
            :url=
            :url-string
            :url-encode
-           :url-decode))
+           :url-decode
+           :url-encode-pathname
+           :url-decode-pathname))
